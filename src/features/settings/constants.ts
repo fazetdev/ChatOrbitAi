@@ -1,0 +1,95 @@
+import {
+  Bell,
+  Bot,
+  Building2,
+  ClipboardList,
+  CreditCard,
+  KeyRound,
+  MessageSquare,
+  Palette,
+  Settings as SettingsIcon,
+  Shield,
+  Users,
+} from "lucide-react";
+
+import type { SettingsSection } from "./types";
+
+export const SETTINGS_SECTIONS: SettingsSection[] = [
+  {
+    id: "business-profile",
+    title: "Business Profile",
+    description: "Business information",
+    icon: Building2,
+    enabled: true,
+  },
+  {
+    id: "team-roles",
+    title: "Team & Roles",
+    description: "Manage workspace members",
+    icon: Users,
+    enabled: true,
+  },
+  {
+    id: "ai-configuration",
+    title: "AI Configuration",
+    description: "Configure AI behaviour",
+    icon: Bot,
+    enabled: true,
+  },
+  {
+    id: "whatsapp",
+    title: "WhatsApp",
+    description: "Connect WhatsApp Business",
+    icon: MessageSquare,
+    enabled: true,
+  },
+  {
+    id: "notifications",
+    title: "Notifications",
+    description: "Notification preferences",
+    icon: Bell,
+    enabled: true,
+  },
+  {
+    id: "appearance",
+    title: "Appearance",
+    description: "Branding and theme",
+    icon: Palette,
+    enabled: true,
+  },
+  {
+    id: "security",
+    title: "Security",
+    description: "Protect your workspace",
+    icon: Shield,
+    enabled: true,
+  },
+  {
+    id: "integrations",
+    title: "API & Integrations",
+    description: "External services",
+    icon: KeyRound,
+    enabled: true,
+  },
+  {
+    id: "billing",
+    title: "Billing",
+    description: "Plans and invoices",
+    icon: CreditCard,
+    enabled: true,
+  },
+  {
+    id: "audit-logs",
+    title: "Audit Logs",
+    description: "Workspace activity",
+    icon: ClipboardList,
+    enabled: true,
+  },
+  {
+    id: "system",
+    title: "System Preferences",
+    description: "Platform configuration",
+    icon: SettingsIcon,
+    enabled: true,
+  },
+];

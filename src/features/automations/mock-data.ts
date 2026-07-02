@@ -1,0 +1,122 @@
+import type { Automation } from "./types";
+
+export const mockAutomations: Automation[] = [
+  {
+    id: "1",
+    name: "Welcome New Customers",
+    description: "Sends a welcome message when a new contact is added.",
+    type: "welcome",
+    trigger: {
+      type: "new-contact",
+      config: {},
+    },
+    status: "active",
+    createdAt: "2026-01-01",
+    updatedAt: "2026-01-10",
+    lastRun: "2 minutes ago",
+  },
+  {
+    id: "2",
+    name: "Pricing Keyword Reply",
+    description: "Auto replies when users ask about pricing.",
+    type: "keyword",
+    trigger: {
+      type: "keyword",
+      config: {
+        keyword: "pricing",
+      },
+    },
+    status: "active",
+    createdAt: "2026-01-02",
+    updatedAt: "2026-01-12",
+    lastRun: "10 minutes ago",
+  },
+  {
+    id: "3",
+    name: "AI Support Assistant",
+    description: "Handles customer support using AI.",
+    type: "ai-assistant",
+    trigger: {
+      type: "first-message",
+      config: {},
+    },
+    status: "active",
+    createdAt: "2026-01-03",
+    updatedAt: "2026-01-11",
+    lastRun: "1 hour ago",
+  },
+  {
+    id: "4",
+    name: "Out of Office Reply",
+    description: "Auto replies outside business hours.",
+    type: "out-of-office",
+    trigger: {
+      type: "business-hours",
+      config: {
+        timezone: "WAT",
+      },
+    },
+    status: "paused",
+    createdAt: "2026-01-04",
+    updatedAt: "2026-01-09",
+    lastRun: "Yesterday",
+  },
+  {
+    id: "5",
+    name: "Lead Qualification Flow",
+    description: "Qualifies incoming leads automatically.",
+    type: "lead",
+    trigger: {
+      type: "new-contact",
+      config: {},
+    },
+    status: "active",
+    createdAt: "2026-01-05",
+    updatedAt: "2026-01-13",
+    lastRun: "3 hours ago",
+  },
+  {
+    id: "6",
+    name: "Appointment Reminder",
+    description: "Reminds customers about upcoming appointments.",
+    type: "appointment",
+    trigger: {
+      type: "business-hours",
+      config: {},
+    },
+    status: "draft",
+    createdAt: "2026-01-06",
+    updatedAt: "2026-01-06",
+    lastRun: null,
+  },
+  {
+    id: "7",
+    name: "Support Escalation",
+    description: "Escalates complex support cases to human agents.",
+    type: "support",
+    trigger: {
+      type: "first-message",
+      config: {},
+    },
+    status: "active",
+    createdAt: "2026-01-07",
+    updatedAt: "2026-01-14",
+    lastRun: "5 hours ago",
+  },
+  {
+    id: "8",
+    name: "Follow-up Reminder",
+    description: "Sends follow-up messages after inactivity.",
+    type: "follow-up",
+    trigger: {
+      type: "keyword",
+      config: {
+        keyword: "followup",
+      },
+    },
+    status: "disabled",
+    createdAt: "2026-01-08",
+    updatedAt: "2026-01-10",
+    lastRun: "2 days ago",
+  },
+];
