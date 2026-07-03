@@ -3,31 +3,33 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { agentSchema, type AgentFormValues } from "../schemas";
-import { AGENT_STATUSES, AGENT_TONES } from "../constants";
+import {
+  knowledgeBaseSchema,
+  type KnowledgeBaseFormValues,
+} from "../schemas";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-interface AgentFormProps {
-  defaultValues?: Partial<AgentFormValues>;
-  onSubmit(values: AgentFormValues): void;
+interface Props {
+  defaultValues?: Partial<KnowledgeBaseFormValues>;
+  onSubmit(values: KnowledgeBaseFormValues): void;
   submitLabel?: string;
 }
 
-export default function AgentForm({
+export default function KnowledgeBaseForm({
   defaultValues,
   onSubmit,
   submitLabel = "Save",
-}: AgentFormProps): React.JSX.Element {
+}: Props): React.JSX.Element {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
-  } = useForm<AgentFormValues>({
-    resolver: zodResolver(agentSchema),
+  } = useForm<KnowledgeBaseFormValues>({
+    resolver: zodResolver(knowledgeBaseSchema),
     defaultValues,
     mode: "onChange",
   });
@@ -35,9 +37,9 @@ export default function AgentForm({
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="space-y-2">
-        <Label htmlFor="agent-name">Name</Label>
+        <Label htmlFor="kb-name">Name</Label>
         <Input
-          id="agent-name"
+          id="kb-name"
           aria-invalid={!!errors.name}
           {...register("name")}
         />
@@ -49,9 +51,9 @@ export default function AgentForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="agent-description">Description</Label>
+        <Label htmlFor="kb-description">Description</Label>
         <Textarea
-          id="agent-description"
+          id="kb-description"
           rows={3}
           aria-invalid={!!errors.description}
           {...register("description")}
@@ -64,54 +66,30 @@ export default function AgentForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="agent-system-prompt">System Prompt</Label>
+        <Label htmlFor="kb-content">Content</Label>
         <Textarea
-          id="agent-system-prompt"
+          id="kb-content"
           rows={8}
-          aria-invalid={!!errors.systemPrompt}
-          {...register("systemPrompt")}
+          aria-invalid={!!errors.content}
+          {...register("content")}
         />
-        {errors.systemPrompt && (
+        {errors.content && (
           <p className="text-sm text-destructive" role="alert">
-            {errors.systemPrompt.message}
+            {errors.content.message}
           </p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="agent-tone">Tone</Label>
+        <Label htmlFor="kb-status">Status</Label>
         <select
-          id="agent-tone"
-          aria-invalid={!!errors.tone}
-          {...register("tone")}
-          className="flex h-10 w-full rounded-md border bg-background px-3"
-        >
-          {AGENT_TONES.map((tone) => (
-            <option key={tone} value={tone}>
-              {tone.charAt(0).toUpperCase() + tone.slice(1)}
-            </option>
-          ))}
-        </select>
-        {errors.tone && (
-          <p className="text-sm text-destructive" role="alert">
-            {errors.tone.message}
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="agent-status">Status</Label>
-        <select
-          id="agent-status"
+          id="kb-status"
           aria-invalid={!!errors.status}
           {...register("status")}
           className="flex h-10 w-full rounded-md border bg-background px-3"
         >
-          {AGENT_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </option>
-          ))}
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
         </select>
         {errors.status && (
           <p className="text-sm text-destructive" role="alert">

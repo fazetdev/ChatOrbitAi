@@ -18,9 +18,36 @@ import EditAgentDialog from "./edit-agent-dialog";
 import DeleteAgentDialog from "./delete-agent-dialog";
 import AgentDetailsSheet from "./agent-details-sheet";
 
+function AgentsSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      <div className="h-10 w-1/3 bg-muted rounded" />
+      <div className="h-10 w-full bg-muted rounded" />
+      <div className="h-64 w-full bg-muted rounded" />
+    </div>
+  );
+}
+
+function ErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <p className="text-sm text-destructive font-medium">
+        Failed to load agents
+      </p>
+      <button
+        onClick={onRetry}
+        className="mt-3 text-sm underline text-primary"
+      >
+        Retry
+      </button>
+    </div>
+  );
+}
+
 export function AgentsView(): React.JSX.Element {
   const [data, setData] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const [openAdd, setOpenAdd] = useState(false);
@@ -33,9 +60,16 @@ export function AgentsView(): React.JSX.Element {
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const result = await agentsService.getAgents();
-      setData(result);
-      setLoading(false);
+      setError(null);
+
+      try {
+        const result = await agentsService.getAgents();
+        setData(result);
+      } catch (e) {
+        setError("Failed to load agents");
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
@@ -55,9 +89,14 @@ export function AgentsView(): React.JSX.Element {
 
   const isEmpty = !loading && filteredData.length === 0;
 
-  /* -----------------------------
-   * ACTION HANDLERS
-   * ----------------------------- */
+  function handleRetry() {
+    setLoading(true);
+    setError(null);
+    agentsService.getAgents().then((result) => {
+      setData(result);
+      setLoading(false);
+    });
+  }
 
   function handleCreate(values: AgentFormValues) {
     const now = new Date().toISOString();
@@ -112,10 +151,6 @@ export function AgentsView(): React.JSX.Element {
     setSelected(null);
   }
 
-  /* -----------------------------
-   * TABLE ACTIONS (SAFE NAMES)
-   * ----------------------------- */
-
   function onView(agent: Agent) {
     setSelected(agent);
     setOpenView(true);
@@ -145,9 +180,9 @@ export function AgentsView(): React.JSX.Element {
       />
 
       {loading ? (
-        <div className="p-4 text-sm text-muted-foreground">
-          Loading agents...
-        </div>
+        <AgentsSkeleton />
+      ) : error ? (
+        <ErrorState onRetry={handleRetry} />
       ) : isEmpty ? (
         <EmptyState
           icon={Bot}
@@ -157,13 +192,13 @@ export function AgentsView(): React.JSX.Element {
       ) : (
         <AgentsTable
           data={filteredData}
+          isLoading={loading}
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
         />
       )}
 
-      {/* Dialogs */}
       <AddAgentDialog
         open={openAdd}
         onOpenChange={setOpenAdd}

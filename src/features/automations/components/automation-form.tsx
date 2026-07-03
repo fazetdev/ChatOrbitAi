@@ -1,11 +1,18 @@
 "use client";
 
-import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { automationSchema, type AutomationFormValues } from "../schemas";
+import {
+  automationSchema,
+  type AutomationFormValues,
+} from "../schemas";
+
 import { AUTOMATION_STATUS, AUTOMATION_TYPES } from "../constants";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   defaultValues?: Partial<AutomationFormValues>;
@@ -15,8 +22,12 @@ interface Props {
 export default function AutomationForm({
   defaultValues,
   onSubmit,
-}: Props) {
-  const form = useForm<AutomationFormValues>({
+}: Props): React.JSX.Element {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+  } = useForm<AutomationFormValues>({
     resolver: zodResolver(automationSchema),
     defaultValues: {
       name: "",
@@ -29,47 +40,74 @@ export default function AutomationForm({
       status: "draft",
       ...defaultValues,
     },
+    mode: "onChange",
   });
 
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
-    >
-      <input
-        placeholder="Name"
-        {...form.register("name")}
-        className="border rounded px-3 py-2"
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      <div className="space-y-2">
+        <Label htmlFor="automation-name">Name</Label>
+        <Input
+          id="automation-name"
+          aria-invalid={!!errors.name}
+          {...register("name")}
+        />
+        {errors.name && (
+          <p className="text-sm text-destructive" role="alert">
+            {errors.name.message}
+          </p>
+        )}
+      </div>
 
-      <input
-        placeholder="Description"
-        {...form.register("description")}
-        className="border rounded px-3 py-2"
-      />
+      <div className="space-y-2">
+        <Label htmlFor="automation-description">Description</Label>
+        <Input
+          id="automation-description"
+          aria-invalid={!!errors.description}
+          {...register("description")}
+        />
+        {errors.description && (
+          <p className="text-sm text-destructive" role="alert">
+            {errors.description.message}
+          </p>
+        )}
+      </div>
 
-      <select {...form.register("type")} className="border rounded px-3 py-2">
-        {AUTOMATION_TYPES.map((t) => (
-          <option key={t} value={t}>
-            {t}
-          </option>
-        ))}
-      </select>
+      <div className="space-y-2">
+        <Label>Type</Label>
+        <select
+          {...register("type")}
+          className="flex h-10 w-full rounded-md border bg-background px-3"
+        >
+          {AUTOMATION_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <select {...form.register("status")} className="border rounded px-3 py-2">
-        {AUTOMATION_STATUS.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+      <div className="space-y-2">
+        <Label>Status</Label>
+        <select
+          {...register("status")}
+          className="flex h-10 w-full rounded-md border bg-background px-3"
+        >
+          {AUTOMATION_STATUS.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <button
+      <Button
         type="submit"
-        className="bg-black text-white rounded px-3 py-2"
+        className="w-full"
+        disabled={!isValid || isSubmitting}
       >
-        Save Automation
-      </button>
+        {isSubmitting ? "Saving..." : "Save Automation"}
+      </Button>
     </form>
   );
 }

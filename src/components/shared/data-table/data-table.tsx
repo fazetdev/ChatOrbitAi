@@ -3,109 +3,84 @@
 import * as React from "react";
 import {
   flexRender,
-  useReactTable,
   getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
+  useReactTable,
   type ColumnDef,
-  type SortingState,
-  type ColumnFiltersState,
 } from "@tanstack/react-table";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DataTableEmpty } from "./data-table-empty";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   emptyMessage?: string;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  emptyMessage = "No results found.",
-}: DataTableProps<TData, TValue>): React.JSX.Element {
-
-  const [sorting, setSorting] =
-    React.useState<SortingState>([]);
-
-  const [columnFilters, setColumnFilters] =
-    React.useState<ColumnFiltersState>([]);
-
+  emptyMessage = "No data found.",
+  isLoading = false,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
-
-    state: {
-      sorting,
-      columnFilters,
-    },
-
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   });
 
-  return (
-    <div className="overflow-hidden rounded-xl border bg-card">
-      <Table>
+  if (isLoading) {
+    return (
+      <div className="space-y-2 animate-pulse">
+        <div className="h-10 w-full rounded bg-muted" />
+        <div className="h-10 w-full rounded bg-muted" />
+        <div className="h-10 w-full rounded bg-muted" />
+      </div>
+    );
+  }
 
-        <TableHeader>
-          {table.getHeaderGroups().map((group) => (
-            <TableRow key={group.id}>
-              {group.headers.map((header) => (
-                <TableHead key={header.id}>
+  if (!table.getRowModel().rows?.length) {
+    return <DataTableEmpty message={emptyMessage} />;
+  }
+
+  return (
+    <div className="w-full overflow-auto rounded-md border">
+      <table className="w-full caption-bottom text-sm">
+        <thead className="[&_tr]:border-b">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th
+                  key={header.id}
+                  className="h-10 px-3 text-left align-middle font-medium text-muted-foreground"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
                         header.column.columnDef.header,
                         header.getContext()
                       )}
-                </TableHead>
+                </th>
               ))}
-            </TableRow>
+            </tr>
           ))}
-        </TableHeader>
+        </thead>
 
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-28 text-center text-muted-foreground"
-              >
-                {emptyMessage}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-
-      </Table>
+        <tbody className="[&_tr:last-child]:border-0">
+          {table.getRowModel().rows.map((row) => (
+            <tr key={row.id} className="border-b transition-colors">
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} className="p-3 align-middle">
+                  {flexRender(
+                    cell.column.columnDef.cell,
+                    cell.getContext()
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

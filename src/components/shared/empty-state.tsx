@@ -17,7 +17,12 @@ export default function EmptyState({
   className,
 }: EmptyStateProps): React.JSX.Element {
   return (
-    <div className={cn("flex flex-col items-center justify-center rounded-xl border p-10 text-center", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-xl border p-6 md:p-10 text-center",
+        className
+      )}
+    >
       {Icon && (
         <div className="mb-4 rounded-full bg-muted p-3">
           <Icon className="h-6 w-6 text-muted-foreground" />

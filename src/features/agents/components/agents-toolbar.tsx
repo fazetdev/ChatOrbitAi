@@ -1,7 +1,6 @@
 "use client";
 
 import { Plus, Search } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -28,10 +27,12 @@ export default function AgentsToolbar({
         />
       </div>
 
-      <Button onClick={onAddAgent}>
-        <Plus className="mr-2 h-4 w-4" />
-        Add Agent
-      </Button>
+      <div className="flex gap-2">
+        <Button onClick={onAddAgent}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Agent
+        </Button>
+      </div>
     </div>
   );
 }

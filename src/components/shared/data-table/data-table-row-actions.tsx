@@ -11,6 +11,29 @@ interface Props<T = BaseRow> {
   onDelete?: (row: T) => void;
 }
 
+function ActionButton({
+  onClick,
+  children,
+  className,
+  "aria-label": ariaLabel,
+}: {
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  children: React.ReactNode;
+  className: string;
+  "aria-label": string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={className}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function DataTableRowActions<T>({
   row,
   onView,
@@ -20,39 +43,42 @@ export function DataTableRowActions<T>({
   return (
     <div className="flex items-center gap-3 text-sm">
       {onView && (
-        <button
+        <ActionButton
           onClick={(e) => {
             e.stopPropagation();
             onView(row);
           }}
-          className="text-blue-600 hover:underline"
+          aria-label="View item"
+          className="text-blue-600 hover:text-blue-700 hover:underline"
         >
           View
-        </button>
+        </ActionButton>
       )}
 
       {onEdit && (
-        <button
+        <ActionButton
           onClick={(e) => {
             e.stopPropagation();
             onEdit(row);
           }}
-          className="text-green-600 hover:underline"
+          aria-label="Edit item"
+          className="text-green-600 hover:text-green-700 hover:underline"
         >
           Edit
-        </button>
+        </ActionButton>
       )}
 
       {onDelete && (
-        <button
+        <ActionButton
           onClick={(e) => {
             e.stopPropagation();
             onDelete(row);
           }}
-          className="text-red-600 hover:underline"
+          aria-label="Delete item"
+          className="text-red-600 hover:text-red-700 hover:underline"
         >
           Delete
-        </button>
+        </ActionButton>
       )}
     </div>
   );
