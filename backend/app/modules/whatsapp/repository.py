@@ -1,3 +1,12 @@
+"""
+Persistence contract for temporary WhatsApp storage.
+
+Long-term ownership of conversations and messages belongs to the
+Conversation module. This repository exists only during the initial
+webhook processing workflow.
+"""
+
+
 from abc import ABC, abstractmethod
 
 from .schemas import DeliveryStatus, IncomingMessage, OutgoingMessage

@@ -1,34 +1,37 @@
-from dataclasses import dataclass
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
 
 from app.events.event_types import EventType
 
 
-@dataclass(frozen=True)
-class WhatsAppEvent:
+class WhatsAppEvent(BaseModel):
     """Base event for the WhatsApp module."""
 
+    model_config = ConfigDict(frozen=True)
+
     event_type: EventType
+    occurred_at: datetime
 
 
-@dataclass(frozen=True)
 class MessageReceivedEvent(WhatsAppEvent):
     """Published when an incoming WhatsApp message is received."""
 
+    conversation_id: str
     message_id: str
-    tenant_id: str
+    phone_number: str
 
 
-@dataclass(frozen=True)
 class MessageSentEvent(WhatsAppEvent):
-    """Published when a WhatsApp message is sent."""
+    """Published when a WhatsApp message is successfully sent."""
 
+    conversation_id: str
     message_id: str
-    tenant_id: str
 
 
-@dataclass(frozen=True)
 class MessageFailedEvent(WhatsAppEvent):
     """Published when a WhatsApp message fails to send."""
 
+    conversation_id: str
     message_id: str
-    tenant_id: str
+    reason: str

@@ -1,41 +1,63 @@
-from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
 from typing import Optional
 
+from pydantic import BaseModel, ConfigDict
 
-@dataclass(frozen=True)
-class WebhookVerification:
+
+class MessageType(str, Enum):
+    """Supported WhatsApp message types."""
+
+    TEXT = "text"
+    IMAGE = "image"
+    AUDIO = "audio"
+    VIDEO = "video"
+    DOCUMENT = "document"
+    STICKER = "sticker"
+    LOCATION = "location"
+    CONTACT = "contact"
+    INTERACTIVE = "interactive"
+    UNKNOWN = "unknown"
+
+
+class WebhookVerification(BaseModel):
     """Incoming webhook verification request."""
+
+    model_config = ConfigDict(frozen=True)
 
     mode: str
     token: str
     challenge: str
 
 
-@dataclass(frozen=True)
-class IncomingMessage:
+class IncomingMessage(BaseModel):
     """Normalized incoming WhatsApp message."""
+
+    model_config = ConfigDict(frozen=True)
 
     message_id: str
     phone_number_id: str
     from_number: str
-    message_type: str
+    message_type: MessageType
     content: str
-    timestamp: str
+    timestamp: datetime
 
 
-@dataclass(frozen=True)
-class OutgoingMessage:
+class OutgoingMessage(BaseModel):
     """Outgoing WhatsApp message."""
+
+    model_config = ConfigDict(frozen=True)
 
     to: str
     content: str
 
 
-@dataclass(frozen=True)
-class DeliveryStatus:
-    """WhatsApp delivery status update."""
+class DeliveryStatus(BaseModel):
+    """Normalized WhatsApp delivery status callback."""
+
+    model_config = ConfigDict(frozen=True)
 
     message_id: str
     status: str
-    timestamp: str
+    timestamp: datetime
     recipient_id: Optional[str] = None
