@@ -1,23 +1,22 @@
 from fastapi import FastAPI
 
+from app.api.router import router as api_router
+from app.core.config import settings
 
 app = FastAPI(
-    title="WhatsApp AI SaaS Backend",
-    description="Backend API for the WhatsApp AI Automation platform",
-    version="0.1.0",
+    title=settings.APP_NAME,
+    description="Backend API for ChatOrbit AI",
+    version=settings.APP_VERSION,
 )
 
 
-@app.get("/")
+@app.get("/", tags=["System"])
 async def root():
+    """Root endpoint."""
     return {
-        "message": "WhatsApp AI SaaS Backend",
+        "message": settings.APP_NAME,
         "status": "running",
     }
 
 
-@app.get("/health")
-async def health():
-    return {
-        "status": "healthy",
-    }
+app.include_router(api_router)

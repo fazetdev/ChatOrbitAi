@@ -5,8 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application configuration."""
-
-    APP_NAME: str = "WhatsApp AI SaaS Backend"
+    APP_NAME: str = "ChatOrbit AI Backend"
     APP_VERSION: str = "0.1.0"
     API_PREFIX: str = "/api/v1"
 

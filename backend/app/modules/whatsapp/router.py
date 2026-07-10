@@ -6,19 +6,26 @@ router = APIRouter(
 )
 
 
-@router.get("")
+@router.get(
+    "",
+    summary="Verify WhatsApp Webhook",
+    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+)
 async def verify_webhook() -> Response:
     """
-    Verify the WhatsApp webhook.
+    Verify the WhatsApp Cloud API webhook.
 
     Implementation will be completed during
-    Milestone 2 when Meta webhook verification
-    is integrated.
+    Milestone 2.
     """
     return Response(status_code=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-@router.post("")
+@router.post(
+    "",
+    summary="Receive WhatsApp Events",
+    status_code=status.HTTP_501_NOT_IMPLEMENTED,
+)
 async def receive_webhook(request: Request) -> Response:
     """
     Receive incoming WhatsApp webhook events.
