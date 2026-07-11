@@ -5,11 +5,20 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application configuration."""
+
     APP_NAME: str = "ChatOrbit AI Backend"
     APP_VERSION: str = "0.1.0"
     API_PREFIX: str = "/api/v1"
 
     DEBUG: bool = False
+
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+
+    LOG_LEVEL: str = "INFO"
+
+    WHATSAPP_API_VERSION: str = "v23.0"
+    WHATSAPP_VERIFY_TOKEN: str = "chatorbit-development-token"
 
     model_config = SettingsConfigDict(
         env_file=".env",
