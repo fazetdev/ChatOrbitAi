@@ -17,8 +17,13 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
-    WHATSAPP_API_VERSION: str = "v23.0"
+    DATABASE_URL: str = (
+        "postgresql+psycopg://postgres:postgres@localhost:5432/chatorbit_ai"
+    )
+    DB_ECHO: bool = False
+
     WHATSAPP_VERIFY_TOKEN: str = "chatorbit-development-token"
+    WHATSAPP_API_VERSION: str = "v23.0"
 
     model_config = SettingsConfigDict(
         env_file=".env",
