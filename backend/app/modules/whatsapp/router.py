@@ -1,11 +1,14 @@
 import logging
 
-from fastapi import APIRouter, Query, Request, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from fastapi.responses import JSONResponse
 
+from app.api.dependencies.whatsapp import get_whatsapp_service
 from app.core.security import verify_webhook_token
 
 from .normalizer import WhatsAppPayloadNormalizer
+from .service import WhatsAppService
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +28,7 @@ async def verify_webhook(
     hub_challenge: str = Query(..., alias="hub.challenge"),
 ) -> Response:
     """
-    Verify the WhatsApp Cloud API webhook.
+    Verify WhatsApp Cloud API webhook.
     """
 
     if verify_webhook_token(
@@ -38,43 +41,43 @@ async def verify_webhook(
             status_code=status.HTTP_200_OK,
         )
 
-    return Response(status_code=status.HTTP_403_FORBIDDEN)
+    return Response(
+        status_code=status.HTTP_403_FORBIDDEN
+    )
 
 
 @router.post(
     "",
     summary="Receive WhatsApp Events",
-    status_code=status.HTTP_200_OK,
 )
-async def receive_webhook(request: Request) -> JSONResponse:
+async def receive_webhook(
+    request: Request,
+    whatsapp_service: WhatsAppService = Depends(
+        get_whatsapp_service
+    ),
+) -> JSONResponse:
     """
-    Receive incoming WhatsApp webhook events.
-
-    Currently this endpoint:
-    - Receives the webhook payload.
-    - Normalizes it into the internal IncomingMessage model.
-    - Logs the successful normalization.
-
-    Business processing (conversation storage, events,
-    automation, AI, etc.) will be implemented in later
-    milestones.
+    Receive WhatsApp messages.
     """
 
     try:
         payload = await request.json()
 
         incoming_message = (
-            WhatsAppPayloadNormalizer.normalize_incoming_message(
+            WhatsAppPayloadNormalizer
+            .normalize_incoming_message(
                 payload
             )
         )
 
+        whatsapp_service.receive_message(
+            incoming_message
+        )
+
         logger.info(
-            "Incoming WhatsApp message normalized.",
+            "WhatsApp message processed",
             extra={
                 "message_id": incoming_message.message_id,
-                "from_number": incoming_message.from_number,
-                "message_type": incoming_message.message_type,
             },
         )
 
@@ -96,12 +99,14 @@ async def receive_webhook(request: Request) -> JSONResponse:
         )
 
     except Exception:
-        logger.exception("Unexpected webhook processing error.")
+        logger.exception(
+            "Webhook processing failed"
+        )
 
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "status": "error",
-                "message": "Internal server error.",
+                "message": "Internal server error",
             },
         )

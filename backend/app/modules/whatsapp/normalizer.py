@@ -1,42 +1,41 @@
-from typing import Any
+from datetime import datetime
 
-from .schemas import IncomingMessage
+from .schemas import IncomingMessage, MessageType
 
 
 class WhatsAppPayloadNormalizer:
     """
-    Converts WhatsApp Cloud API webhook payloads
-    into ChatOrbit AI domain models.
+    Convert WhatsApp Cloud API payloads
+    into internal models.
     """
 
     @staticmethod
-    def normalize_incoming_message(...)(payload: dict[str, Any]) -> IncomingMessage:
-        """
-        Convert a Meta webhook payload into an
-        IncomingMessage.
-
-        Raises:
-            ValueError:
-                If the payload is not a supported
-                WhatsApp message event.
-        """
+    def normalize_incoming_message(
+        payload: dict,
+    ) -> IncomingMessage:
 
         try:
             value = payload["entry"][0]["changes"][0]["value"]
 
-            metadata = value["metadata"]
             message = value["messages"][0]
 
             return IncomingMessage(
                 message_id=message["id"],
-                phone_number_id=metadata["phone_number_id"],
+                phone_number_id=value["metadata"]["phone_number_id"],
                 from_number=message["from"],
-                message_type=message["type"],
-                content=message["text"]["body"],
-                timestamp=message["timestamp"],
+                message_type=MessageType(
+                    message.get("type", "unknown")
+                ),
+                content=(
+                    message.get("text", {})
+                    .get("body", "")
+                ),
+                timestamp=datetime.fromtimestamp(
+                    int(message["timestamp"])
+                ),
             )
 
-        except (KeyError, IndexError, TypeError) as exc:
+        except Exception as exc:
             raise ValueError(
-                "Unsupported WhatsApp webhook payload."
+                "Invalid WhatsApp payload"
             ) from exc

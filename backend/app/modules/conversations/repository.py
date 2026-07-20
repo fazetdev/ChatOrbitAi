@@ -1,49 +1,68 @@
 from abc import ABC, abstractmethod
 
-from .schemas import Conversation, ConversationMessage, ConversationState
+from sqlalchemy.orm import Session
+
+from app.db.models.conversation import Conversation
+from app.db.models.message import Message
 
 
 class ConversationRepository(ABC):
     """
-    Repository contract for Conversation persistence.
+    Repository contract for conversation persistence.
     """
 
     @abstractmethod
-    def create_conversation(
+    def create(self, conversation: Conversation) -> Conversation:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_id(self, conversation_id: str) -> Conversation | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def save(self, conversation: Conversation) -> Conversation:
+        raise NotImplementedError
+
+
+class SQLConversationRepository(ConversationRepository):
+    """
+    SQLAlchemy implementation.
+    """
+
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create(
         self,
         conversation: Conversation,
-    ) -> None:
-        """
-        Persist a new conversation.
-        """
-        raise NotImplementedError
+    ) -> Conversation:
 
-    @abstractmethod
-    def save_message(
-        self,
-        message: ConversationMessage,
-    ) -> None:
-        """
-        Persist a conversation message.
-        """
-        raise NotImplementedError
+        self.db.add(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
 
-    @abstractmethod
-    def get_conversation(
+        return conversation
+
+    def get_by_id(
         self,
         conversation_id: str,
     ) -> Conversation | None:
-        """
-        Retrieve a conversation.
-        """
-        raise NotImplementedError
 
-    @abstractmethod
-    def update_state(
+        return (
+            self.db.query(Conversation)
+            .filter(
+                Conversation.id == conversation_id
+            )
+            .first()
+        )
+
+    def save(
         self,
-        state: ConversationState,
-    ) -> None:
-        """
-        Persist the conversation state.
-        """
-        raise NotImplementedError
+        conversation: Conversation,
+    ) -> Conversation:
+
+        self.db.add(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
+
+        return conversation

@@ -1,31 +1,60 @@
-"""
-Persistence contract for temporary WhatsApp storage.
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-Long-term ownership of conversations and messages belongs to the
-Conversation module. This repository exists only during the initial
-webhook processing workflow.
-"""
+from app.db.models import Message, DeliveryEvent
 
 
-from abc import ABC, abstractmethod
+class WhatsAppRepository:
+    """
+    Repository for WhatsApp message persistence.
+    """
 
-from .schemas import DeliveryStatus, IncomingMessage, OutgoingMessage
+    def __init__(
+        self,
+        db: Session,
+    ) -> None:
+        self.db = db
 
+    def save_incoming_message(
+        self,
+        message: Message,
+    ) -> Message:
 
-class WhatsAppRepository(ABC):
-    """Repository contract for WhatsApp integration."""
+        self.db.add(message)
+        self.db.commit()
+        self.db.refresh(message)
 
-    @abstractmethod
-    def save_incoming_message(self, message: IncomingMessage) -> None:
-        """Persist an incoming WhatsApp message."""
-        raise NotImplementedError
+        return message
 
-    @abstractmethod
-    def save_outgoing_message(self, message: OutgoingMessage) -> None:
-        """Persist an outgoing WhatsApp message."""
-        raise NotImplementedError
+    def save_outgoing_message(
+        self,
+        message: Message,
+    ) -> Message:
 
-    @abstractmethod
-    def save_delivery_status(self, status: DeliveryStatus) -> None:
-        """Persist a delivery status update."""
-        raise NotImplementedError
+        self.db.add(message)
+        self.db.commit()
+        self.db.refresh(message)
+
+        return message
+
+    def save_delivery_status(
+        self,
+        event: DeliveryEvent,
+    ) -> DeliveryEvent:
+
+        self.db.add(event)
+        self.db.commit()
+        self.db.refresh(event)
+
+        return event
+
+    def get_by_external_message_id(
+        self,
+        external_message_id: str,
+    ) -> Message | None:
+
+        stmt = select(Message).where(
+            Message.external_message_id == external_message_id
+        )
+
+        return self.db.scalar(stmt)

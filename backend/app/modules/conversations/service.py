@@ -1,72 +1,50 @@
-from .events import (
-    ConversationUpdatedEvent,
-    MessageReceivedEvent,
-    MessageStoredEvent,
-)
-from .repository import ConversationRepository
-from .schemas import Conversation, ConversationMessage, ConversationState
+from sqlalchemy.orm import Session
 
-from app.modules.whatsapp.schemas import IncomingMessage
+from app.db.models.conversation import Conversation
 
-from .repository import ConversationRepository
-from .schemas import (
-    Conversation,
-    ConversationMessage,
-    ConversationState,
-)
 
 class ConversationService:
     """
-    Application service for conversation management.
+    Business logic for conversations.
     """
 
     def __init__(
         self,
-        repository: ConversationRepository,
-    ) -> None:
-        self._repository = repository
+        db: Session,
+    ):
+        self.db = db
 
-    def process_incoming_message(
+    def get_conversation_by_phone(
         self,
-        message: IncomingMessage,
-    ) -> None:
-        """
-        Process a normalized incoming WhatsApp message.
+        phone: str,
+    ) -> Conversation | None:
 
-        Full business implementation will be completed
-        during the Conversation milestone.
-        """
-
-        raise NotImplementedError(
-            "Conversation processing will be implemented in a later milestone."
+        return (
+            self.db.query(Conversation)
+            .filter(
+                Conversation.contact_phone == phone
+            )
+            .first()
         )
 
     def create_conversation(
         self,
         conversation: Conversation,
-    ) -> None:
-        """
-        Create a new conversation.
-        """
+    ) -> Conversation:
 
-        self._repository.create_conversation(conversation)
+        self.db.add(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
 
-    def save_message(
+        return conversation
+
+    def update_last_message(
         self,
-        message: ConversationMessage,
-    ) -> None:
-        """
-        Persist a conversation message.
-        """
+        conversation: Conversation,
+    ) -> Conversation:
 
-        self._repository.save_message(message)
+        self.db.add(conversation)
+        self.db.commit()
+        self.db.refresh(conversation)
 
-    def update_state(
-        self,
-        state: ConversationState,
-    ) -> None:
-        """
-        Persist conversation state.
-        """
-
-        self._repository.update_state(state)
+        return conversation
